@@ -61,7 +61,7 @@ class Recipe(models.Model):
     text = models.TextField('Описание')
     image = models.ImageField(
         'Изображение',
-        upload_to='recipes/')
+        upload_to='recipes/images/')
     cooking_time = models.PositiveSmallIntegerField(
         'Время приготовления',
         validators=[MinValueValidator(
@@ -118,3 +118,49 @@ class IngredientInRecipe(models.Model):
 
     def __str__(self):
         return f'{self.ingredient} – {self.amount}'
+
+
+class Favorite(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name="Пользователь",
+        related_name="favorite",
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        verbose_name="Рецепт",
+        related_name="favorite",
+    )
+
+    class Meta:
+        verbose_name = "Список избранного"
+        verbose_name_plural = "Список избранного"
+        ordering = ("recipe",)
+
+    def __str__(self):
+        return f"{self.user} {self.recipe}"
+
+
+class ShoppingCart(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name="Пользователь",
+        related_name="shopping_cart",
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        verbose_name="Рецепт",
+        related_name="shopping_cart",
+    )
+
+    class Meta:
+        verbose_name = "Список покупок"
+        verbose_name_plural = "Список покупок"
+        ordering = ("recipe",)
+
+    def __str__(self):
+        return f"{self.user} {self.recipe}"

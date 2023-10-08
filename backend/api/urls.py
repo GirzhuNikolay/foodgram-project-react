@@ -11,6 +11,7 @@ router_v1 = SimpleRouter()
 router_v1.register('tags', TagViewSet)
 router_v1.register('ingredients', IngredientViewSet)
 
+
 urlpatterns = [
     path('', include(router_v1.urls)),
     path("", include("djoser.urls")),

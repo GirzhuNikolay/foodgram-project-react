@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import UniqueConstraint
 
@@ -54,8 +55,20 @@ class Subscribe(models.Model):
         ordering = ['-id']
         constraints = [
             UniqueConstraint(
-                fields=['user', 'author'], name='unique_subscription'
+                fields=['user', 'author'],
+                name='Подписка на автора уже оформлена'
             )
         ]
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
+
+    def clean(self):
+        if self.user == self.author:
+            raise ValidationError('Нельзя подписываться на себя')
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Вы подписались на {self.author}"
