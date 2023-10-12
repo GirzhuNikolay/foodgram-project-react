@@ -7,7 +7,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-lg68^rlj3@13(#n=7zt!6$d6d87e3*v=k#5$ofys&32xmay7o='
 
-
 DEBUG = True
 
 ALLOWED_HOSTS = []
@@ -113,3 +112,5 @@ DJOSER = {
         'current_user': 'djoser.serializers.UserSerializer',
         },
 }
+
+FILE_NAME = 'purchases.pdf'
