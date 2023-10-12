@@ -34,19 +34,19 @@ class User(AbstractUser):
         ordering = ["id"]
 
     def __str__(self):
-        return f"{self.username} {self.first_name}"
+        return f"{self.username} {self.email}"
 
 
 class Subscribe(models.Model):
     user = models.ForeignKey(
         User,
-        related_name='subscriber',
+        related_name='follower',
         verbose_name="Подписчик",
         on_delete=models.CASCADE,
     )
     author = models.ForeignKey(
         User,
-        related_name='subscribing',
+        related_name='following',
         verbose_name="Автор",
         on_delete=models.CASCADE,
     )

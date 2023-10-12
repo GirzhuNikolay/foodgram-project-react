@@ -54,5 +54,5 @@ class IngredientSerializer(ModelSerializer):
         fields = (
             'id',
             'name',
-            'unit_of_measurement'
+            'measurement_unit'
         )

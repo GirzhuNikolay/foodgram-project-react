@@ -7,23 +7,24 @@ from recipes.models import (
 
 
 class TagAdmin(admin.ModelAdmin):
-    list_display = ('name', 'color', 'slug')
+    list_display = ('id', 'name', 'color', 'slug')
     list_display_links = ('name',)
-    search_fields = ('name',)
+    search_fields = ('id', 'name',)
     list_filter = ('name',)
 
 
 class IngredientAdmin(admin.ModelAdmin):
-    list_display = ('name', 'measurement_unit')
+    list_display = ('id', 'name', 'measurement_unit')
     list_display_links = ('name',)
     search_fields = ('name',)
     list_filter = ('name',)
 
 
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'author', 'added_in_favorites')
+    list_display = (
+        'id', 'name', 'author', 'added_in_favorites',)
     list_display_links = ('name',)
-    search_fields = ('name',)
+    search_fields = ('name', 'author',)
     list_filter = ('author', 'name', 'tags')
     readonly_fields = ('added_in_favorites',)
     filter_horizontal = ('tags',)
