@@ -8,7 +8,8 @@ class IsAdminOrReadOnly(BasePermission):
                 or request.user.is_staff)
 
 
-class IsAdminAuthorOrReadOnly(BasePermission):
+class IsAuthorOrAdminOrReadOnly(BasePermission):
+    '''Разрешение для автора или только на чтение.'''
 
     def has_permission(self, request, view):
         return (request.method in SAFE_METHODS
