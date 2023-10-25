@@ -86,6 +86,7 @@ DATABASES = {
 #     }
 # }
 
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -127,7 +128,7 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_PAGINATION_CLASS': [
         'rest_framework.pagination.PageNumberPagination',
@@ -148,7 +149,7 @@ DJOSER = {
         "current_user": "api.serializers.CustomUserSerializer",
     },
     'PERMISSIONS': {
-        "user": ["rest_framework.permissions.IsAuthenticated"],
+        "user": ["rest_framework.permissions.AllowAny"],
         "user_list": ["rest_framework.permissions.AllowAny"],
         "token_destroy": ["rest_framework.permissions.IsAuthenticated"],
     },

@@ -10,22 +10,23 @@ from users.models import User
 class CustomUserSerializer(UserSerializer):
     '''Сериализзатор пользователей.'''
 
-    is_subscribed = serializers.SerializerMethodField(read_only=True)
+    is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = (
-            'email', 'id', 'username', 'first_name', 'last_name',
-            'is_subscribed'
+            'email', 'id', 'username',
+            'first_name', 'last_name', 'is_subscribed'
         )
+    read_only_fields = ("is_subscribed",)
 
     def get_is_subscribed(self, obj):
-        if self.context.get('request').user.is_anonymous:
+        user = self.context['request'].user
+
+        if user.is_anonymous:
             return False
-        return Follow.objects.filter(
-            author=obj,
-            user=self.context.get('request').user
-        ).exists()
+
+        return Follow.objects.filter(user=user, author=obj).exists()
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):
@@ -238,7 +239,7 @@ class ShortRecipeSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'image', 'cooking_time')
 
 
-class SubscribeSerializer(serializers.ModelSerializer):
+class FollowSerializer(serializers.ModelSerializer):
     '''Сериализатор отображения списка подписок.'''
 
     recipes = serializers.SerializerMethodField(method_name='get_recipes')

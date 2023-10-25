@@ -68,10 +68,10 @@ class Recipe(models.Model):
 
     author = models.ForeignKey(
         User,
-        verbose_name='Автор',
         on_delete=models.CASCADE,
+        verbose_name='Автор',
         related_name='recipes',
-        help_text='Автора рецепта',
+        help_text='Автор рецепта',
     )
     name = models.CharField(
         verbose_name='Название рецепта',
@@ -130,15 +130,15 @@ class RecipeIngredient(models.Model):
 
     recipe = models.ForeignKey(
         Recipe,
-        verbose_name='Рецепт',
         on_delete=models.CASCADE,
+        verbose_name='Рецепт',
         related_name='ingredient',
         help_text='Рецепт',
     )
     ingredient = models.ForeignKey(
         Ingredient,
-        verbose_name='Ингредиент',
         on_delete=models.CASCADE,
+        verbose_name='Ингредиент',
         related_name='ingredient',
         help_text='Ингредиент',
     )
@@ -173,15 +173,15 @@ class Follow(models.Model):
 
     user = models.ForeignKey(
         User,
-        verbose_name='Подписчик',
         on_delete=models.CASCADE,
+        verbose_name='Подписчик',
         related_name='follower',
         help_text='Подписчик',
     )
     author = models.ForeignKey(
         User,
-        verbose_name='Автор',
         on_delete=models.CASCADE,
+        verbose_name='Автор',
         related_name='author',
         help_text='Автор',
     )
@@ -203,8 +203,8 @@ class FavoriteRecipe(models.Model):
 
     user = models.ForeignKey(
         User,
-        verbose_name='Пользователь',
         on_delete=models.CASCADE,
+        verbose_name='Пользователь',
         related_name='favorite',
         help_text='Пользователь добавивший рецепт',
     )
@@ -233,15 +233,15 @@ class ShoppingCart(models.Model):
 
     user = models.ForeignKey(
         User,
-        verbose_name='Пользователь',
         on_delete=models.CASCADE,
+        verbose_name='Пользователь',
         related_name='shopping',
         help_text='Пользователь добавивший покупки',
     )
     recipe = models.ForeignKey(
         Recipe,
-        verbose_name='Покупки',
         on_delete=models.CASCADE,
+        verbose_name='Покупки',
         related_name='shopping',
         help_text='Рецепт для покупок',
     )

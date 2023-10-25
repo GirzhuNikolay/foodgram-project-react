@@ -51,15 +51,15 @@ class TagAdmin(admin.ModelAdmin):
 
 @admin.register(Follow)
 class FollowAdmin(admin.ModelAdmin):
-    list_display = ('id', 'get_follow',)
+    list_display = ('id', 'following',)
     list_filter = ('author',)
     search_fields = ('author__username', 'user__username',)
 
-    def get_follow(self, obj):
+    def following(self, obj):
         return (f'Пользователь {str(obj.user).capitalize()} '
                 f'подписан на {str(obj.author).capitalize()}.')
 
-    get_follow.short_description = 'Подписки на пользователей'
+    following.short_description = 'Подписки на пользователей'
 
 
 @admin.register(FavoriteRecipe)
