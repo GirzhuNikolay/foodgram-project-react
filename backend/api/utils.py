@@ -48,7 +48,7 @@ def render_pdf(ingredients):
     grocery_list = {}
     download = io.BytesIO()
     pdfmetrics.registerFont(
-        TTFont('verdana', 'fonts/verdana.ttf', 'UTF-8'))
+        TTFont('typeface', 'fonts/typeface.ttf', 'UTF-8'))
     for ingredient in ingredients:
         if ingredient[0] not in grocery_list:
             grocery_list[ingredient[0]] = {
@@ -58,16 +58,16 @@ def render_pdf(ingredients):
         else:
             grocery_list[ingredient[0]]['amount'] += ingredient[2]
     report = canvas.Canvas(download)
-    report.setFont('verdana', 22)
+    report.setFont('typeface', 22)
     report.drawString(20, 800, 'Cписок покупок:')
     height = 770
-    report.setFont('verdana', 14)
+    report.setFont('typeface', 14)
     for i, (name, data) in enumerate(grocery_list.items(), 1):
         report.drawString(40, height, (f'{i}. {name.capitalize()} - '
                                        f'{data["amount"]} '
                                        f'{data["measurement_unit"]}'))
         height -= 30
-    report.setFont('verdana', 16)
+    report.setFont('typeface', 16)
     report.setFillColorRGB(0.25, 0.25, 0.25)
     report.drawCentredString(
         300, 30, 'Продуктовый помощник.'

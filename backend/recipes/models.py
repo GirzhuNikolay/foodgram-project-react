@@ -9,12 +9,12 @@ class Ingredient(models.Model):
     """Класс интредиент"""
     name = models.CharField(
         verbose_name='Наименование ингредиента',
-        max_length=254,
+        max_length=150,
         help_text='Наименование ингредиента',
     )
     measurement_unit = models.CharField(
         verbose_name='Единица измерения',
-        max_length=254,
+        max_length=150,
         help_text='Единица измерения',
     )
 
@@ -24,7 +24,7 @@ class Ingredient(models.Model):
         verbose_name_plural = 'Ингредиенты'
 
     def __str__(self):
-        return self.name[:50].capitalize()
+        return self.name
 
 
 class Tag(models.Model):
@@ -50,7 +50,7 @@ class Tag(models.Model):
         unique=True,
         validators=[RegexValidator(
             regex=r'^[-a-zA-Z0-9_]+$',
-            message='Слаг содержит недопустимый символ'
+            message='Использован недопустимый символ'
         )]
     )
 
@@ -60,7 +60,7 @@ class Tag(models.Model):
         ordering = ('name',)
 
     def __str__(self):
-        return self.name[:50]
+        return self.name
 
 
 class Recipe(models.Model):
@@ -122,7 +122,7 @@ class Recipe(models.Model):
         verbose_name_plural = 'Рецепты'
 
     def __str__(self):
-        return self.name[:50]
+        return self.name
 
 
 class RecipeIngredient(models.Model):
@@ -171,7 +171,7 @@ class RecipeIngredient(models.Model):
 class Follow(models.Model):
     """Класс подписки"""
 
-    user = models.ForeignKey(
+    follower = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         verbose_name='Подписчик',
@@ -187,15 +187,18 @@ class Follow(models.Model):
     )
 
     class Meta:
-        ordering = ('id',)
+        ordering = ('-id',)
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
         constraints = [
             models.UniqueConstraint(
-                fields=('user', 'author',),
+                fields=('follower', 'author',),
                 name='unique_follow',
             ),
         ]
+
+    def __str__(self):
+        return f'{self.follower} подписался на: {self.author}'
 
 
 class FavoriteRecipe(models.Model):
@@ -227,6 +230,9 @@ class FavoriteRecipe(models.Model):
             ),
         ]
 
+    def __str__(self):
+        return f'{self.recipe} добавлен в избранное'
+
 
 class ShoppingCart(models.Model):
     """Класс покупок"""
@@ -235,14 +241,14 @@ class ShoppingCart(models.Model):
         User,
         on_delete=models.CASCADE,
         verbose_name='Пользователь',
-        related_name='shopping',
+        related_name='shopping_cart',
         help_text='Пользователь добавивший покупки',
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
         verbose_name='Покупки',
-        related_name='shopping',
+        related_name='shopping_cart',
         help_text='Рецепт для покупок',
     )
 
@@ -253,6 +259,9 @@ class ShoppingCart(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=('user', 'recipe',),
-                name='unique_shoppingcart',
+                name='unique_shopping_cart',
             ),
         ]
+
+    def __str__(self):
+        return f'{self.recipe} добавлен в покупки.'

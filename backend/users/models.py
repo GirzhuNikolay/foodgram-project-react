@@ -20,7 +20,7 @@ class User(AbstractUser):
         db_index=True,
         validators=[RegexValidator(
             regex=r'^[\w.@+-]+$',
-            message='Введены недопустимый символ'
+            message='В имени использованы запрещенные символы'
         )]
     )
     first_name = models.CharField(
@@ -32,8 +32,8 @@ class User(AbstractUser):
         max_length=150,
     )
     password = models.CharField(
+        verbose_name='Пароль',
         max_length=254,
-        verbose_name='Пароль'
     )
 
     USERNAME_FIELD = 'email'

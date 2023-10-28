@@ -3,11 +3,23 @@ from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
-from recipes.models import Follow, Ingredient, Recipe, RecipeIngredient, Tag
+from recipes.models import Ingredient, Recipe, RecipeIngredient, Tag
 from users.models import User
 
 
-class CustomUserSerializer(UserSerializer):
+class GetIsSubscribedMixin:
+
+    def get_is_subscribed(self, obj):
+        user = self.context['request'].user
+        return (
+            user.follower.filter(author=obj).exists()
+            if user.is_authenticated
+            else False
+        )
+
+
+class CustomUserSerializer(GetIsSubscribedMixin,
+                           UserSerializer):
     '''Сериализзатор пользователей.'''
 
     is_subscribed = serializers.SerializerMethodField()
@@ -20,13 +32,13 @@ class CustomUserSerializer(UserSerializer):
         )
     read_only_fields = ("is_subscribed",)
 
-    def get_is_subscribed(self, obj):
-        user = self.context['request'].user
+    # def get_is_subscribed(self, obj):
+    #     user = self.context['request'].user
 
-        if user.is_anonymous:
-            return False
+    #     if user.is_anonymous:
+    #         return False
 
-        return Follow.objects.filter(user=user, author=obj).exists()
+    #     return Follow.objects.filter(user=user, author=obj).exists()
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):
@@ -66,7 +78,7 @@ class GetTokenSerializer(serializers.Serializer):
                     "Невозможно зайти в систему",
                     code='authorization')
         else:
-            msg = 'Необходимо указать "адрес электронной почты" и "пароль".'
+            msg = 'Укажите почту и пароль'
             raise serializers.ValidationError(
                 msg,
                 code='authorization')
@@ -151,7 +163,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         name = data.get('name')
         if len(name) > 254:
             raise serializers.ValidationError(
-                'Слишком длинное название.'
+                'Размер имени превышен'
             )
         ingredients = data.get('ingredients')
         ingredients_list = [ingredient.get('id') for ingredient in ingredients]
@@ -159,7 +171,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         for ingredient in ingredients:
             if ingredient.get('id') > count:
                 raise serializers.ValidationError(
-                    'Нет такого ингредиента.'
+                    'Нет ингредиента.'
                 )
             if ingredients_list.count(ingredient['id']) > 1:
                 duble = Ingredient.objects.get(

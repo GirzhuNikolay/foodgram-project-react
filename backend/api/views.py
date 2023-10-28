@@ -10,8 +10,9 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from recipes.models import (FavoriteRecipe, Follow, Ingredient, Recipe,
-                            RecipeIngredient, ShoppingCart, Tag)
+from recipes.models import (Follow, Ingredient, Recipe,
+                            RecipeIngredient, FavoriteRecipe,
+                            ShoppingCart, Tag)
 from users.models import User
 from .filters import IngredientSearchFilter
 from .pagination import CustomPagination
@@ -19,7 +20,8 @@ from .permissions import IsAdminOrReadOnly, IsAuthorOrAdminOrReadOnly
 from .serializers import (GetTokenSerializer,
                           IngredientSerializer,
                           RecipeCreateSerializer, RecipeListSerializer,
-                          SubscribeRecipeSerializer, FollowSerializer,
+                          SubscribeRecipeSerializer,
+                          FollowSerializer,
                           TagSerializer)
 from .utils import delete, post, render_pdf
 
@@ -32,7 +34,7 @@ class ListViewSet(mixins.CreateModelMixin,
 
 
 class AuthToken(ObtainAuthToken):
-    """Авторизация пользователя."""
+    """Авторизация"""
 
     serializer_class = GetTokenSerializer
     permission_classes = (AllowAny,)
@@ -55,7 +57,7 @@ class CustomUserViewSet(views.UserViewSet):
 
     @action(
         detail=False,
-        methods=('get',),
+        methods=('get', 'patch'),
         serializer_class=FollowSerializer,
         permission_classes=(IsAuthenticated, )
     )
@@ -71,8 +73,9 @@ class CustomUserViewSet(views.UserViewSet):
 
     @action(
         detail=True,
-        methods=('post', 'delete'),
-        serializer_class=FollowSerializer
+        methods=('get', 'post', 'delete'),
+        serializer_class=FollowSerializer,
+        permission_classes=(IsAuthenticated, )
     )
     def subscribe(self, request, id=None):
         user = self.request.user
@@ -81,13 +84,13 @@ class CustomUserViewSet(views.UserViewSet):
         if self.request.method == 'POST':
             if user == author:
                 raise exceptions.ValidationError(
-                    'Нельзя подписаться на себя.'
+                    'На себя подписываться нельзя'
                 )
             if Follow.objects.filter(
                 user=user,
                 author=author
             ).exists():
-                raise exceptions.ValidationError('Подписка уже оформлена.')
+                raise exceptions.ValidationError('Подписка уже есть.')
 
             Follow.objects.create(user=user, author=author)
             serializer = self.get_serializer(author, many=True)
@@ -100,7 +103,7 @@ class CustomUserViewSet(views.UserViewSet):
                 author=author
             ).exists():
                 raise exceptions.ValidationError(
-                    'Подписка отсутствует'
+                    'Подписки нет'
                 )
 
             subscription = get_object_or_404(
@@ -116,7 +119,7 @@ class CustomUserViewSet(views.UserViewSet):
 
 
 class FollowViewSet(APIView):
-    '''Подписка/отмена'''
+    '''Подписка, отмена подписки'''
 
     permission_classes = (IsAuthenticated,)
 
@@ -145,14 +148,6 @@ class FollowList(ListViewSet):
         return Follow.objects.filter(user=self.request.user)
 
 
-class TagViewSet(ListViewSet):
-    '''Список тегов.'''
-
-    queryset = Tag.objects.all()
-    serializer_class = TagSerializer
-    pagination_class = None
-
-
 class IngredientViewSet(ListViewSet):
     '''Список ингредиентов'''
 
@@ -163,11 +158,20 @@ class IngredientViewSet(ListViewSet):
     search_fields = ('^name',)
 
 
+class TagViewSet(ListViewSet):
+    '''Список тегов.'''
+
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+    pagination_class = None
+
+
 class RecipeViewSet(viewsets.ModelViewSet):
     '''Рецепты'''
 
     pagination_class = CustomPagination
     permission_classes = (IsAuthorOrAdminOrReadOnly | IsAdminOrReadOnly,)
+    # filter_backends = (RecipeFilter,)
 
     def get_queryset(self):
         queryset = Recipe.objects.select_related(
