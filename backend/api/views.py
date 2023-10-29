@@ -2,28 +2,26 @@ from django.db.models import Exists, OuterRef
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from djoser import views
-from rest_framework import mixins, status, viewsets, exceptions
-from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework import exceptions, mixins, status, viewsets
 from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from recipes.models import (Follow, Ingredient, Recipe,
-                            RecipeIngredient, FavoriteRecipe,
-                            ShoppingCart, Tag)
+from recipes.models import (Ingredient, FavoriteRecipe, Follow,
+                            Recipe, RecipeIngredient, ShoppingCart, Tag)
 from users.models import User
+
 from .filters import IngredientSearchFilter
 from .pagination import CustomPagination
 from .permissions import IsAdminOrReadOnly, IsAuthorOrAdminOrReadOnly
-from .serializers import (GetTokenSerializer,
-                          IngredientSerializer,
+from .serializers import (IngredientSerializer, FollowSerializer,
+                          GetTokenSerializer,
                           RecipeCreateSerializer, RecipeListSerializer,
-                          SubscribeRecipeSerializer,
-                          FollowSerializer,
-                          TagSerializer)
-from .utils import delete, post, render_pdf
+                          ShortRecipeSerializer, TagSerializer)
+from .utils import delete, post, forming_pdf
 
 
 class ListViewSet(mixins.CreateModelMixin,
@@ -45,9 +43,8 @@ class AuthToken(ObtainAuthToken):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
-        return Response(
-            {'auth_token': token.key},
-            status=status.HTTP_201_CREATED)
+        return Response({'auth_token': token.key},
+                        status=status.HTTP_201_CREATED)
 
 
 class CustomUserViewSet(views.UserViewSet):
@@ -63,7 +60,7 @@ class CustomUserViewSet(views.UserViewSet):
     )
     def subscriptions(self, request):
         user = self.request.user
-        user_subscriptions = user.subscribes.all()
+        user_subscriptions = user.follower.all()
         authors = [item.author.id for item in user_subscriptions]
         queryset = User.objects.filter(pk__in=authors)
         paginated_queryset = self.paginate_queryset(queryset)
@@ -74,17 +71,17 @@ class CustomUserViewSet(views.UserViewSet):
     @action(
         detail=True,
         methods=('get', 'post', 'delete'),
-        serializer_class=FollowSerializer,
+        serializer_class=(FollowSerializer, ),
         permission_classes=(IsAuthenticated, )
     )
-    def subscribe(self, request, id=None):
+    def get_subscribe(self, request, id=None):
         user = self.request.user
         author = get_object_or_404(User, pk=id)
 
         if self.request.method == 'POST':
             if user == author:
                 raise exceptions.ValidationError(
-                    'На себя подписываться нельзя'
+                    'Нельзя подписываться на себя'
                 )
             if Follow.objects.filter(
                 user=user,
@@ -142,7 +139,7 @@ class FollowList(ListViewSet):
 
     serializer_class = FollowSerializer
     permission_classes = (IsAuthenticated,)
-    pagination_class = None
+    pagination_class = CustomPagination
 
     def get_queryset(self):
         return Follow.objects.filter(user=self.request.user)
@@ -153,9 +150,9 @@ class IngredientViewSet(ListViewSet):
 
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    pagination_class = None
     filter_backends = (IngredientSearchFilter,)
     search_fields = ('^name',)
+    pagination_class = None
 
 
 class TagViewSet(ListViewSet):
@@ -171,7 +168,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     pagination_class = CustomPagination
     permission_classes = (IsAuthorOrAdminOrReadOnly | IsAdminOrReadOnly,)
-    # filter_backends = (RecipeFilter,)
 
     def get_queryset(self):
         queryset = Recipe.objects.select_related(
@@ -222,7 +218,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if request.method == 'POST':
             return post(
                 request, pk, Recipe,
-                FavoriteRecipe, SubscribeRecipeSerializer
+                FavoriteRecipe, ShortRecipeSerializer
             )
         if request.method == 'DELETE':
             return delete(request, pk, Recipe, FavoriteRecipe)
@@ -237,7 +233,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if request.method == 'POST':
             return post(
                 request, pk, Recipe,
-                ShoppingCart, SubscribeRecipeSerializer
+                ShoppingCart, ShortRecipeSerializer
             )
         if request.method == 'DELETE':
             return delete(request, pk, Recipe, ShoppingCart)
@@ -251,6 +247,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             'ingredient__name', 'ingredient__measurement_unit', 'amount'
         )
         return FileResponse(
-            render_pdf(ingredients),
+            forming_pdf(ingredients),
             as_attachment=True,
             filename='shopping_cart.pdf',)

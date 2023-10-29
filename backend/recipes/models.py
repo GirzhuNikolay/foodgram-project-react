@@ -7,6 +7,7 @@ from users.models import User
 
 class Ingredient(models.Model):
     """Класс интредиент"""
+
     name = models.CharField(
         verbose_name='Наименование ингредиента',
         max_length=150,
@@ -75,7 +76,7 @@ class Recipe(models.Model):
     )
     name = models.CharField(
         verbose_name='Название рецепта',
-        max_length=200,
+        max_length=150,
         help_text='Название рецепта',
     )
     image = models.ImageField(
@@ -241,14 +242,14 @@ class ShoppingCart(models.Model):
         User,
         on_delete=models.CASCADE,
         verbose_name='Пользователь',
-        related_name='shopping_cart',
+        related_name='shopping',
         help_text='Пользователь добавивший покупки',
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
         verbose_name='Покупки',
-        related_name='shopping_cart',
+        related_name='shopping',
         help_text='Рецепт для покупок',
     )
 
@@ -259,7 +260,7 @@ class ShoppingCart(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=('user', 'recipe',),
-                name='unique_shopping_cart',
+                name='unique_shopping',
             ),
         ]
 

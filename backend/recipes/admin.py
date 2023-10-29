@@ -38,7 +38,6 @@ class RecipeAdmin(admin.ModelAdmin):
 
 @admin.register(RecipeIngredient)
 class RecipeIngredientAdmin(admin.ModelAdmin):
-    """Класс настройки соответствия игредиентов и рецептов."""
 
     list_display = (
         'pk',
