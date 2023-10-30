@@ -2,13 +2,12 @@ from django.db.models import Exists, OuterRef
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from djoser import views
-from rest_framework import exceptions, mixins, status, viewsets
+from rest_framework import mixins, status, viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from recipes.models import (Ingredient, FavoriteRecipe, Follow,
                             Recipe, RecipeIngredient, ShoppingCart, Tag)
@@ -126,36 +125,6 @@ class CustomUserViewSet(views.UserViewSet):
             result_pages, context={'request': request}, many=True
         )
         return paginator.get_paginated_response(serializer.data)
-
-
-# class FollowViewSet(APIView):
-#     '''Подписка, отмена подписки'''
-
-#     permission_classes = (IsAuthenticated,)
-
-#     def post(self, request, user_id):
-#         serializer = FollowShowSerializer(
-#             data={'user': request.user.id, 'author': user_id}
-#         )
-#         serializer.is_valid(raise_exception=True)
-#         serializer.save()
-#         return Response(data=serializer.data, status=status.HTTP_201_CREATED)
-
-#     def delete(self, request, user_id):
-#         follow = get_object_or_404(Follow, author=user_id, user=request.user)
-#         follow.delete()
-#         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-# class FollowList(ListViewSet):
-#     '''Списк подписок.'''
-
-#     serializer_class = FollowShowSerializer
-#     permission_classes = (IsAuthenticated,)
-#     pagination_class = CustomPagination
-
-#     def get_queryset(self):
-#         return Follow.objects.filter(user=self.request.user)
 
 
 class IngredientViewSet(ListViewSet):
