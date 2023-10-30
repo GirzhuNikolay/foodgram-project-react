@@ -2,6 +2,7 @@ from django.contrib.auth import authenticate
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 
 from recipes.models import Ingredient, Follow, Recipe, RecipeIngredient, Tag
 from users.models import User
@@ -227,6 +228,29 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             }).data
 
 
+class FollowSerializer(serializers.ModelSerializer):
+    """Сериализатор для модели Follow."""
+
+    class Meta:
+        model = Follow
+        fields = '__all__'
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Follow.objects.all(),
+                fields=('author', 'follower'),
+                message='Вы уже подписывались на этого автора'
+            )
+        ]
+
+    def validate(self, data):
+        """Проверяем, что пользователь не подписывается на самого себя."""
+        if data['follower'] == data['author']:
+            raise serializers.ValidationError(
+                'Подписка на cамого себя не имеет смысла'
+            )
+        return data
+
+
 class ShortRecipeSerializer(serializers.ModelSerializer):
     """Список рецептов в подписке"""
 
@@ -235,7 +259,7 @@ class ShortRecipeSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'image', 'cooking_time')
 
 
-class FollowSerializer(serializers.ModelSerializer):
+class FollowShowSerializer(serializers.ModelSerializer):
     '''Сериализатор отображения списка подписок.'''
 
     recipes = serializers.SerializerMethodField(method_name='get_recipes')
@@ -254,9 +278,7 @@ class FollowSerializer(serializers.ModelSerializer):
 
     def get_recipes(self, object):
         author_recipes = object.recipes.all()
-        return ShortRecipeSerializer(
-            author_recipes, many=True
-        ).data
+        return ShortRecipeSerializer(author_recipes, many=True).data
 
     def get_recipes_count(self, object):
         return object.recipes.count()

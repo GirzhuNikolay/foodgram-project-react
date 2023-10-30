@@ -25,7 +25,7 @@ def delete(request, pk, get_object, models):
     obj = get_object_or_404(get_object, id=pk)
     if not models.objects.filter(recipe=obj, user=request.user).exists():
         return Response({'message':
-                         f'Вы не добавляли рецепт {obj}.'})
+                         f'Нет добавленных рецептов{obj}.'})
     models.objects.filter(
         recipe=obj, user=request.user
     ).delete()
@@ -47,7 +47,7 @@ def forming_pdf(ingredients):
             grocery_list[ingredient[0]]['amount'] += ingredient[2]
     report = canvas.Canvas(download)
     report.setFont('typeface', 20)
-    report.drawString(20, 800, 'Cписок рецептов в корзине:')
+    report.drawString(20, 800, 'Cписок продуктов в корзине:')
     height = 750
     report.setFont('typeface', 14)
     for i, (name, data) in enumerate(grocery_list.items(), 1):
