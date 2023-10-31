@@ -62,8 +62,8 @@ class CustomUserViewSet(views.UserViewSet):
         permission_classes=(IsAuthenticated,)
     )
     def get_me(self, request):
-        """Позволяет пользователю получить подробную информацию о себе
-        и редактировать её."""
+        """Информация о себе"""
+
         if request.method == 'PATCH':
             serializer = CustomUserSerializer(
                 request.user, data=request.data,
@@ -85,8 +85,8 @@ class CustomUserViewSet(views.UserViewSet):
         permission_classes=(IsAuthenticated,)
     )
     def get_subscribe(self, request, id):
-        """Позволяет текущему пользователю подписываться/отписываться от
-        от автора контента, чей профиль он просматривает."""
+        """Подписка/отписка от автора"""
+
         author = get_object_or_404(User, id=id)
         if request.method == 'POST':
             serializer = FollowSerializer(
@@ -114,8 +114,8 @@ class CustomUserViewSet(views.UserViewSet):
         permission_classes=(IsAuthenticated,)
     )
     def get_subscriptions(self, request):
-        """Возвращает авторов контента, на которых подписан
-        текущий пользователь.."""
+        """Список пользователей, на которых есть подписка."""
+
         authors = User.objects.filter(author__follower=request.user)
         paginator = CustomPagination()
         result_pages = paginator.paginate_queryset(
@@ -221,7 +221,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return delete(request, pk, Recipe, ShoppingCart)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=False, permission_classes=[IsAuthenticated])
+    @action(
+            detail=False,
+            permission_classes=[IsAuthenticated]
+    )
     def download_shopping_cart(self, request):
         ingredients = RecipeIngredient.objects.filter(
             recipe__shopping__user=request.user

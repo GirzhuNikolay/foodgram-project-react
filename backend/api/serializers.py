@@ -243,7 +243,8 @@ class FollowSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, data):
-        """Проверяем, что пользователь не подписывается на самого себя."""
+        """Запрет подписки на себя"""
+
         if data['follower'] == data['author']:
             raise serializers.ValidationError(
                 'Подписка на cамого себя не имеет смысла'
@@ -260,7 +261,7 @@ class ShortRecipeSerializer(serializers.ModelSerializer):
 
 
 class FollowShowSerializer(serializers.ModelSerializer):
-    '''Сериализатор отображения списка подписок.'''
+    '''Сериализатор списка подписок.'''
 
     recipes = serializers.SerializerMethodField(method_name='get_recipes')
     recipes_count = serializers.SerializerMethodField(
