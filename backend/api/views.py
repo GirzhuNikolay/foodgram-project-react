@@ -222,8 +222,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
     @action(
-            detail=False,
-            permission_classes=[IsAuthenticated]
+        detail=False,
+        permission_classes=[IsAuthenticated]
     )
     def download_shopping_cart(self, request):
         ingredients = RecipeIngredient.objects.filter(

@@ -43,8 +43,7 @@ class RecipeIngredientAdmin(admin.ModelAdmin):
         'pk',
         'recipe',
         'ingredient',
-        'amount',
-    )
+        'amount', )
     empty_value_display = '-пусто-'
     list_per_page = settings.L_P_P
 
