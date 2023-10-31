@@ -14,9 +14,9 @@ class RecipeIngredientInline(admin.TabularInline):
 @admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
     list_display = ('pk', 'name', 'measurement_unit', )
-    list_filter = ('name', )
+    list_filter = ('name',)
     list_per_page = settings.L_P_P
-    search_fields = ('name', )
+    search_fields = ('name',)
     empty_value_display = '-пусто-'
 
 
@@ -27,7 +27,7 @@ class RecipeAdmin(admin.ModelAdmin):
                     'get_favorite_count', 'cooking_time', 'image', )
     list_filter = ('author__username', 'name', 'tags', )
     search_fields = ('author__username', 'name', 'tags__name', )
-    filter_horizontal = ('tags', )
+    filter_horizontal = ('tags',)
     empty_value_display = '-пусто-'
 
     def get_favorite_count(self, obj):
@@ -52,16 +52,16 @@ class RecipeIngredientAdmin(admin.ModelAdmin):
 class TagAdmin(admin.ModelAdmin):
     list_display = ('pk', 'name', 'color', 'slug', )
     empty_value_display = '-пусто-'
-    list_filter = ('name', )
+    list_filter = ('name',)
     list_per_page = settings.L_P_P
-    search_fields = ('name', )
-    prepopulated_fields = {'slug': ('name', )}
+    search_fields = ('name',)
+    prepopulated_fields = {'slug': ('name',)}
 
 
 @admin.register(Follow)
 class FollowAdmin(admin.ModelAdmin):
     list_display = ('pk', 'follower', )
-    list_filter = ('author', )
+    list_filter = ('author',)
     search_fields = ('author__username', 'user__username', )
 
     def following(self, obj):
@@ -85,8 +85,8 @@ class FavoriteAdmin(admin.ModelAdmin):
 @admin.register(ShoppingCart)
 class ShoppingAdmin(admin.ModelAdmin):
     list_display = ('id', 'get_shopping', )
-    list_filter = ('recipe', )
-    search_fields = ('recipe__name', )
+    list_filter = ('recipe',)
+    search_fields = ('recipe__name',)
     list_per_page = settings.L_P_P
 
     def get_shopping(self, obj):
