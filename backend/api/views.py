@@ -35,7 +35,7 @@ class AuthToken(ObtainAuthToken):
     """Авторизация"""
 
     serializer_class = GetTokenSerializer
-    permission_classes = (AllowAny,)
+    permission_classes = (AllowAny, )
     pagination_class = None
 
     def post(self, request, *args, **kwargs):
@@ -51,7 +51,7 @@ class CustomUserViewSet(views.UserViewSet):
 
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer
-    permission_classes = (IsAuthorOrAdminOrReadOnly,)
+    permission_classes = (IsAuthorOrAdminOrReadOnly, )
     pagination_class = CustomPagination
 
     @action(
@@ -59,7 +59,7 @@ class CustomUserViewSet(views.UserViewSet):
         methods=['get', 'patch'],
         url_path='me',
         url_name='me',
-        permission_classes=(IsAuthenticated,)
+        permission_classes=(IsAuthenticated, )
     )
     def get_me(self, request):
         """Информация о себе"""
@@ -111,7 +111,7 @@ class CustomUserViewSet(views.UserViewSet):
         methods=['get'],
         url_path='subscriptions',
         url_name='subscriptions',
-        permission_classes=(IsAuthenticated,)
+        permission_classes=(IsAuthenticated, )
     )
     def get_subscriptions(self, request):
         """Список пользователей, на которых есть подписка."""
@@ -132,8 +132,8 @@ class IngredientViewSet(ListViewSet):
 
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    filter_backends = (IngredientSearchFilter,)
-    search_fields = ('^name',)
+    filter_backends = (IngredientSearchFilter, )
+    search_fields = ('^name', )
     pagination_class = None
 
 
@@ -234,4 +234,4 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return FileResponse(
             forming_pdf(ingredients),
             as_attachment=True,
-            filename='shopping_cart.pdf',)
+            filename='shopping_cart.pdf', )

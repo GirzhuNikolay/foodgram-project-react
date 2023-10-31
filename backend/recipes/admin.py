@@ -51,7 +51,7 @@ class RecipeIngredientAdmin(admin.ModelAdmin):
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'name', 'color', 'slug')
+    list_display = ('pk', 'name', 'color', 'slug', )
     empty_value_display = '-пусто-'
     list_filter = ('name', )
     list_per_page = settings.L_P_P
@@ -62,7 +62,7 @@ class TagAdmin(admin.ModelAdmin):
 @admin.register(Follow)
 class FollowAdmin(admin.ModelAdmin):
     list_display = ('pk', 'follower', )
-    list_filter = ('author',)
+    list_filter = ('author', )
     search_fields = ('author__username', 'user__username', )
 
     def following(self, obj):
