@@ -35,17 +35,6 @@ services:
       - static:/var/html/static/
       - media:/var/html/media/
       - redoc:/usr/share/nginx/html/api/docs/
-  # gateway:
-  #   image: girzhunikolay/foodgram_gateway
-  #   env_file:
-  #     - ./.env
-  #   depends_on:
-  #     - backend
-  #   ports:
-  #     - 80:80
-  #   volumes:
-  #     - static:/app/static/
-  #     - media:/app/media/
 
 volumes:
   pg_data:
