@@ -22,7 +22,7 @@ class IngredientAdmin(admin.ModelAdmin):
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
-    inlines = [RecipeIngredientInline,]
+    inlines = [RecipeIngredientInline]
     list_display = ('pk', 'name', 'author', 'pub_date', 'text',
                     'get_favorite_count', 'cooking_time', 'image')
     list_filter = ('author__username', 'name', 'tags')
