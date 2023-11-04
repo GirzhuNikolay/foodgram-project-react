@@ -232,8 +232,8 @@ docker creation
    - GET /api/recipes/download_shopping_cart/
 
 **Проект доступен по адресу:** 
-- https://nikgir.ddns.net
 
+   - https://nikgir.ddns.net
   
   
 
