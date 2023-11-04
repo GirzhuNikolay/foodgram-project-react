@@ -13,7 +13,7 @@ from recipes.models import (Ingredient, FavoriteRecipe, Follow,
                             Recipe, RecipeIngredient, ShoppingCart, Tag)
 from users.models import User
 
-from .filters import IngredientSearchFilter
+from .filters import IngredientSearchFilter, RecipeFilter
 from .pagination import CustomPagination
 from .permissions import IsAdminOrReadOnly, IsAuthorOrAdminOrReadOnly
 from .serializers import (CustomUserSerializer, IngredientSerializer,
@@ -21,7 +21,7 @@ from .serializers import (CustomUserSerializer, IngredientSerializer,
                           GetTokenSerializer,
                           RecipeCreateSerializer, RecipeListSerializer,
                           ShortRecipeSerializer, TagSerializer)
-from .utils import delete, post, forming_pdf
+from .utils import post, forming_pdf
 
 
 class ListViewSet(mixins.CreateModelMixin,
@@ -158,6 +158,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         shopping_cart = self.request.query_params.get('is_in_shopping_cart')
         author = self.request.query_params.get('author')
         tags = self.request.query_params.getlist('tags')
+        recipe_filter = RecipeFilter(self.request.GET, queryset=queryset)
+        queryset = recipe_filter.qs
         if favorited:
             queryset = queryset.filter(favorite__user=self.request.user)
         if shopping_cart:
@@ -191,6 +193,17 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
+    @staticmethod
+    def delete(request, pk, get_object, models):
+        obj = get_object_or_404(get_object, id=pk)
+        if not models.objects.filter(recipe=obj, user=request.user).exists():
+            return Response({'message':
+                             f'Нет добавленных рецептов{obj}.'})
+        models.objects.filter(
+            recipe=obj, user=request.user
+        ).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
     @action(
         detail=True,
         methods=['POST', 'DELETE'],
@@ -203,7 +216,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 FavoriteRecipe, ShortRecipeSerializer
             )
         if request.method == 'DELETE':
-            return delete(request, pk, Recipe, FavoriteRecipe)
+            return RecipeViewSet.delete(request, pk, Recipe, FavoriteRecipe)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
     @action(
@@ -218,7 +231,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 ShoppingCart, ShortRecipeSerializer
             )
         if request.method == 'DELETE':
-            return delete(request, pk, Recipe, ShoppingCart)
+            return RecipeViewSet.delete(request, pk, Recipe, ShoppingCart)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
     @action(

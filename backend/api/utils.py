@@ -21,15 +21,15 @@ def post(request, pk, get_object, models, serializer):
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-def delete(request, pk, get_object, models):
-    obj = get_object_or_404(get_object, id=pk)
-    if not models.objects.filter(recipe=obj, user=request.user).exists():
-        return Response({'message':
-                         f'Нет добавленных рецептов{obj}.'})
-    models.objects.filter(
-        recipe=obj, user=request.user
-    ).delete()
-    return Response(status=status.HTTP_204_NO_CONTENT)
+# def delete(request, pk, get_object, models):
+#     obj = get_object_or_404(get_object, id=pk)
+#     if not models.objects.filter(recipe=obj, user=request.user).exists():
+#         return Response({'message':
+#                          f'Нет добавленных рецептов{obj}.'})
+#     models.objects.filter(
+#         recipe=obj, user=request.user
+#     ).delete()
+#     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 def forming_pdf(ingredients):
@@ -45,12 +45,14 @@ def forming_pdf(ingredients):
             }
         else:
             grocery_list[ingredient[0]]['amount'] += ingredient[2]
+    sorted_grocery_list = sorted(grocery_list.items(),
+                                 key=lambda item: item[0])
     report = canvas.Canvas(download)
     report.setFont('typeface', 20)
     report.drawString(20, 800, 'Cписок продуктов в корзине:')
     height = 750
     report.setFont('typeface', 14)
-    for i, (name, data) in enumerate(grocery_list.items(), 1):
+    for i, (name, data) in enumerate(sorted_grocery_list, 1):
         report.drawString(45, height, (f'{i}. {name.capitalize()} - '
                                        f'{data["amount"]} '
                                        f'{data["measurement_unit"]}'))
