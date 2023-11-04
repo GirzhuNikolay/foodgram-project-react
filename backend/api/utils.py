@@ -21,17 +21,6 @@ def post(request, pk, get_object, models, serializer):
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-# def delete(request, pk, get_object, models):
-#     obj = get_object_or_404(get_object, id=pk)
-#     if not models.objects.filter(recipe=obj, user=request.user).exists():
-#         return Response({'message':
-#                          f'Нет добавленных рецептов{obj}.'})
-#     models.objects.filter(
-#         recipe=obj, user=request.user
-#     ).delete()
-#     return Response(status=status.HTTP_204_NO_CONTENT)
-
-
 def forming_pdf(ingredients):
     grocery_list = {}
     download = io.BytesIO()
