@@ -2,7 +2,6 @@
 import django_filters
 from django.contrib.auth import get_user_model
 from rest_framework.filters import SearchFilter
-
 from recipes.models import Recipe
 
 User = get_user_model()
