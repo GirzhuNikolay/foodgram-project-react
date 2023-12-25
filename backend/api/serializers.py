@@ -154,7 +154,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         name = data.get('name')
         if len(name) > 254:
             raise serializers.ValidationError(
-                'Размер имени превышен'
+                'Превышен размер имени'
             )
         ingredients = data.get('ingredients')
         ingredients_list = [ingredient.get('id') for ingredient in ingredients]
@@ -237,7 +237,7 @@ class FollowSerializer(serializers.ModelSerializer):
             UniqueTogetherValidator(
                 queryset=Follow.objects.all(),
                 fields=('author', 'follower'),
-                message='Вы уже подписывались на этого автора'
+                message='Подписка на этого автора уже есть'
             )
         ]
 

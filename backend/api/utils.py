@@ -49,7 +49,7 @@ def forming_pdf(ingredients):
     report.setFont('typeface', 16)
     report.setFillColorRGB(0.25, 0.25, 0.25)
     report.drawCentredString(
-        300, 30, 'Ваш продуктовый помощник.'
+        300, 30, 'Ваш продуктовый помощник FoodGram!'
     )
     report.showPage()
     report.save()
